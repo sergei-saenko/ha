@@ -3,7 +3,7 @@
 
 hosts = {
   "c1" => "192.168.56.105",
-  "c2" => "192.168.56.106,
+  "c2" => "192.168.56.106",
   "c3" => "192.168.56.107"
 }
 
@@ -20,9 +20,9 @@ Vagrant.configure("2") do |config|
 			v.name = "%s" % name
 			end	
   		machine.vm.provision "shell", inline: <<-SHELL
-    		 yum update -y
-    		 yum install pcs pacemaker fence-agents-all 
+    		 yum update -y && yum install pcs pacemaker fence-agents-all -y
     		 systemctl stop firewalld && systemctl disable firewalld
+		 setenforce 0 && sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
    		SHELL
 		end
          end
