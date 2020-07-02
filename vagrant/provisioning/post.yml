@@ -1,0 +1,40 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - lineinfile: 
+        dest: /etc/sudoers 
+        line: '%sudoroot ALL=(ALL) NOPASSWD: ALL'
+        state: present 
+
+    - group:
+        name: sudoroot
+        state: present
+
+    - user: 
+        name: sergei 
+        shell: /bin/bash
+        groups: sudoroot  
+        createhome: yes
+
+    - authorized_key:
+        user: sergei 
+        state: present
+        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
+    - selinux:
+        state: disabled
+    
+    - systemd:
+        name: firewalld
+        state: stopped
+        enabled: no
+
+    - timezone:
+        name: Europe/Kiev
+
+    - yum:
+        name: epel-release
+        state: latest
+
+
